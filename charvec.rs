@@ -1,7 +1,7 @@
 use rand::prelude::*;
 use rand_pcg::Pcg64Mcg;
 
-fn bench_str(n: usize, m: usize) -> u32 {
+fn bench_string(n: usize, m: usize) -> u32 {
     // XXX Initialize with "official" PCG state constant.
     let mut rng = Pcg64Mcg::new(0xcafef00dd15ea5e5);
     let index: String = (0..m).map(|_| rng.gen::<char>()).collect();
@@ -32,8 +32,8 @@ fn main() {
     let n = args[2].parse().unwrap();
     let m = args[3].parse().unwrap();
     match &*args[1] {
-        "--str" => {
-            println!("{}", bench_str(n, m));
+        "--string" => {
+            println!("{}", bench_string(n, m));
         }
         "--charvec" => {
             println!("{}", bench_charvec(n, m));
