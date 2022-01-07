@@ -31,11 +31,6 @@ changing PRNG gave comparable results.
 ![unicode](unicode.png)
 *Time for 100,000,000 random accesses of* m *random Unicode code points.*
 
-The jagginess at low numbers seems to be a result of PRNG
-weirdness. Switching to a different PRNG (see the branch
-`fastrand` in this repo) cleaned up much of it and changed
-the pattern, so it doesn't seem to be intrinsic.
-
 As expected `Vec<char>` dominates `String` at longer
 sequence lengths. Slightly more surprisingly, it is not
 faster at any length.
