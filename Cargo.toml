@@ -3,10 +3,9 @@ name = "charvec"
 version = "0.1.0"
 edition = "2021"
 
-[dependencies.fastrand]
-version = "0.1"
-git = "http://github.com/BartMassey/fastrand"
-
 [[bin]]
 name = "charvec"
 path = "charvec.rs"
+
+[dependencies]
+fastrand = "1.6.0"
