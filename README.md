@@ -21,6 +21,10 @@ Care is taken to make the printed output a function of the
 input so that nothing is optimized out.  Results are for my
 Debian Bullseye Linux box with a Ryzen 9 3900X processor.
 
+Just a single representative run is shown.  Changing PRNG
+seed and repeated runs gave identical results.  Even
+changing PRNG gave comparable results.
+
 ![ascii](ascii.png)
 *Time for 100,000,000 random accesses of* m *random ASCII characters.*
 
