@@ -1,5 +1,4 @@
-use rand::prelude::*;
-use rand_pcg::Pcg64Mcg;
+use fastrand::Rng;
 
 #[derive(Debug, Clone, Copy)]
 enum Charset {
@@ -7,41 +6,52 @@ enum Charset {
     Ascii,
 }
 
+fn char(rng: &mut Rng) -> char {
+    let largest = char::MAX as u32;
+    let surrogate_start = 0xd800u32;
+    let surrogate_len = 0x800u32;
+    let mut val = rng.u32(..largest - surrogate_len);
+    if surrogate_start <= val {
+        val += surrogate_len;
+    }
+    val.try_into().unwrap()
+}
+
 impl Charset {
-    fn gen_char(self, rng: &mut Pcg64Mcg) -> char {
+    fn gen_char(self, rng: &mut Rng) -> char {
         match self {
-            Self::Unicode => rng.gen(),
-            Self::Ascii => rng.gen_range(0u8 as char..=0xffu8 as char),
+            Self::Unicode => char(rng),
+            Self::Ascii => rng.u8(..) as char,
         }
     }
 }
 
-fn bench_string(rng: &mut Pcg64Mcg, charset: Charset, n: usize, m: usize) -> u32 {
+fn bench_string(rng: &mut Rng, charset: Charset, n: usize, m: usize) -> u32 {
     let index: String = (0..m).map(|_| charset.gen_char(rng)).collect();
     let mut result = 0;
     for _ in 0..n {
-        let i = rng.gen_range(0..m);
+        let i = rng.usize(..m);
         let c = index.chars().nth(i).unwrap();
         result ^= c as u32;
     }
     result
 }
 
-fn bench_charvec(rng: &mut Pcg64Mcg, charset: Charset, n: usize, m: usize) -> u32 {
+fn bench_charvec(rng: &mut Rng, charset: Charset, n: usize, m: usize) -> u32 {
     let index: Vec<char> = (0..m).map(|_| charset.gen_char(rng)).collect();
     let mut result = 0;
     for _ in 0..n {
-        let i = rng.gen_range(0..m);
+        let i = rng.usize(..m);
         let c = index[i];
         result ^= c as u32;
     }
     result
 }
 
-fn bench_baseline(rng: &mut Pcg64Mcg, _charset: Charset, n: usize, m: usize) -> u32 {
+fn bench_baseline(rng: &mut Rng, _charset: Charset, n: usize, m: usize) -> u32 {
     let mut result = 0;
     for _ in 0..n {
-        let i: usize = rng.gen_range(0..m);
+        let i: usize = rng.usize(..m);
         result ^= i as u32;
     }
     result
@@ -63,7 +73,7 @@ fn main() {
     let n = args[3].parse().unwrap();
     let m = args[4].parse().unwrap();
 
-    // XXX Initialize RNG with "default" PCG state.
-    let mut rng = Pcg64Mcg::new(0xcafef00dd15ea5e5);
+    let mut rng = Rng::new();
+    rng.seed(0x123456789abcdef0);
     println!("{}", algorithm(&mut rng, charset, n, m));
 }
